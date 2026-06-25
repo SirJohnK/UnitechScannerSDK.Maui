@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="Unitech.Scanner.Binding/Unitech.Scanner.Binding.csproj" />
+  <Project Path="UnitechScannerSDK.Maui.Sample/UnitechScannerSDK.Maui.Sample.csproj" Id="d0e4120d-73a3-44d2-a178-1efeed1df3db">
+    <Deploy Solution="Debug|*" />
+  </Project>
+  <Project Path="UnitechScannerSDK.Maui/UnitechScannerSDK.Maui.csproj" />
+  <Project Path="ZXing.Net.Maui.BarcodeGenerator/ZXing.Net.Maui.BarcodeGenerator.csproj" />
+</Solution>

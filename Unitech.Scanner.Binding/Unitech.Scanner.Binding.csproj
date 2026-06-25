@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    .NET binding library for the Unitech Android Scanner SDK
+    Source artifact: Jars/ScannerSDK_v1_2_0_2.aar  (package com.unitech.scanner / com.unitech.lib.*)
+
+    This produces a managed assembly that a .NET MAUI (or any .NET for Android) app
+    can reference to talk to Unitech MS6xx/MS8xx Bluetooth barcode scanners from C#.
+
+    Build:
+      dotnet workload install android        # one-time, requires nuget.org access
+      dotnet build -c Release
+  -->
+
+  <PropertyGroup>
+    <!-- Retarget to net8.0-android or net10.0-android to match your MAUI app if needed. -->
+    <TargetFramework>net9.0-android</TargetFramework>
+
+    <!-- The AAR's AndroidManifest.xml declares minSdkVersion=28, so consumers must be API 28+. -->
+    <SupportedOSPlatformVersion>28</SupportedOSPlatformVersion>
+
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+
+    <!-- Identity of the produced assembly -->
+    <AssemblyName>Unitech.Scanner.Binding</AssemblyName>
+    <RootNamespace>Unitech.Scanner.Binding</RootNamespace>
+    <PackageId>Unitech.Scanner.Binding</PackageId>
+    <Version>1.2.0.2</Version>
+    <Description>.NET for Android binding for the Unitech Scanner SDK (v1.2.0.2).</Description>
+
+    <!-- Binding projects don't ship satellite resources; keep output lean. -->
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);BG8605;BG8800;BG8C00</NoWarn>
+  </PropertyGroup>
+
+  <!--
+    The AAR is added as an AndroidLibrary with Bind="true", which runs the Java
+    binding generator over its classes.jar at build time. Because R.txt is empty
+    (the SDK ships no Android resources) this binds cleanly as a code-only library.
+  -->
+  <ItemGroup>
+    <AndroidLibrary Include="Jars\ScannerSDK_v1_2_0_2.aar" Bind="true" />
+  </ItemGroup>
+
+  <!-- Metadata transforms applied to the generated API before C# is emitted. -->
+  <ItemGroup>
+    <TransformFile Include="Transforms\Metadata.xml" />
+  </ItemGroup>
+
+</Project>

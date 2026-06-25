@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Metadata transforms for the Unitech Scanner SDK binding.
+
+  This SDK binds cleanly with defaults: it has no third-party dependencies,
+  ships no Android resources (empty R.txt), and exposes only two public nested
+  types, both ordinary nested enums:
+      com.unitech.lib.types.scanner.BarcodeID.BarcodeType   -> BarcodeID.BarcodeType
+      com.unitech.lib.types.scanner.EngineModel.EngineVendor -> EngineModel.EngineVendor
+
+  Java packages map to C# namespaces by Pascal-casing:
+      com.unitech.lib.detect          -> Com.Unitech.Lib.Detect
+      com.unitech.lib.reader          -> Com.Unitech.Lib.Reader
+      com.unitech.lib.event           -> Com.Unitech.Lib.Event
+      com.unitech.lib.event.scanner   -> Com.Unitech.Lib.Event.Scanner
+      com.unitech.lib.types           -> Com.Unitech.Lib.Types
+      com.unitech.lib.types.scanner   -> Com.Unitech.Lib.Types.Scanner
+      com.unitech.lib.model.scanner   -> Com.Unitech.Lib.Model.Scanner
+
+  All transforms below are COMMENTED OUT on purpose. They are real, valid
+  examples tailored to this SDK. Enable any you want by uncommenting; react to
+  actual generator output (BGxxxx messages) by uncommenting the relevant ones.
+  Docs: https://learn.microsoft.com/dotnet/android/binding-libs/customizing-bindings/java-bindings-metadata
+-->
+<metadata>
+
+  <!-- ====================================================================
+       1. OPTIONAL: shorten the namespaces from Com.Unitech.Lib.* to Unitech.*
+       Apply to every package you want renamed. Example for the two packages a
+       typical app touches most:
+
+  <attr path="/api/package[@name='com.unitech.lib.detect']"
+        name="managedName">Unitech.Scanner.Detect</attr>
+  <attr path="/api/package[@name='com.unitech.lib.reader']"
+        name="managedName">Unitech.Scanner.Reader</attr>
+  <attr path="/api/package[@name='com.unitech.lib.event']"
+        name="managedName">Unitech.Scanner.Events</attr>
+  <attr path="/api/package[@name='com.unitech.lib.event.scanner']"
+        name="managedName">Unitech.Scanner.Events.Scanner</attr>
+  <attr path="/api/package[@name='com.unitech.lib.types']"
+        name="managedName">Unitech.Scanner.Types</attr>
+  <attr path="/api/package[@name='com.unitech.lib.types.scanner']"
+        name="managedName">Unitech.Scanner.Types.Scanner</attr>
+  <attr path="/api/package[@name='com.unitech.lib.model.scanner']"
+        name="managedName">Unitech.Scanner.Model</attr>
+       ==================================================================== -->
+
+  <!-- ====================================================================
+       2. OPTIONAL: trim the low-level wire-protocol/codec surface that most
+       apps never call directly (Marson/Unitech/Sunlux/MCU packets & codecs).
+       This makes IntelliSense cleaner. Do NOT remove BaseProtocol/BaseTransport
+       or MCUPacket. They appear in public high-level signatures
+       (BaseReader.getProtocol(), BaseReader.getTransport(),
+        BaseDevice.executeCommand(MCUPacket,int)).
+
+  <remove-node path="/api/package[@name='com.unitech.lib.protocol.marson']/class[@name='MarsonCodec']" />
+  <remove-node path="/api/package[@name='com.unitech.lib.protocol.Unitech']/class[@name='UnitechCodec']" />
+       ==================================================================== -->
+
+  <!-- ====================================================================
+       3. IF the generator reports a covariant-return clash on the param model
+       (BaseParam.toDeviceParam/toEngineParam vs the overrides in DeviceParam/
+       EngineParam), hide the redundant override so the inherited one is used:
+
+  <remove-node path="/api/package[@name='com.unitech.lib.model.scanner']/class[@name='DeviceParam']/method[@name='toDeviceParam' and count(parameter)=0]" />
+  <remove-node path="/api/package[@name='com.unitech.lib.model.scanner']/class[@name='EngineParam']/method[@name='toEngineParam' and count(parameter)=0]" />
+       ==================================================================== -->
+
+  <!-- ====================================================================
+       4. IF a public field collides with a generated property name, rename it.
+       Example for BaseDevice's public listener field:
+
+  <attr path="/api/package[@name='com.unitech.lib.device']/class[@name='BaseDevice']/field[@name='_deviceEventListener']"
+        name="managedName">DeviceEventListener</attr>
+       ==================================================================== -->
+
+  <!-- ====================================================================
+       5. FIX: IDeviceEventListener and IReaderEventListener both live in
+       com.unitech.lib.event and share Java method names batteryPercentageEvent,
+       batteryStateEvent and notificationEvent. The binding generator creates
+       EventArgs classes named after the managed method, so both interfaces
+       produce the same class names in the same C# namespace, causing CS0102
+       duplicate-definition errors. Prefix the IDeviceEventListener methods
+       with "Device" so their EventArgs classes get unique names:
+         DeviceBatteryPercentageEventEventArgs
+         DeviceBatteryStateEventEventArgs
+         DeviceNotificationEventEventArgs
+       ==================================================================== -->
+  <attr path="/api/package[@name='com.unitech.lib.event']/interface[@name='IDeviceEventListener']/method[@name='batteryPercentageEvent']"
+        name="managedName">DeviceBatteryPercentageEvent</attr>
+  <attr path="/api/package[@name='com.unitech.lib.event']/interface[@name='IDeviceEventListener']/method[@name='batteryStateEvent']"
+        name="managedName">DeviceBatteryStateEvent</attr>
+  <attr path="/api/package[@name='com.unitech.lib.event']/interface[@name='IDeviceEventListener']/method[@name='notificationEvent']"
+        name="managedName">DeviceNotificationEvent</attr>
+
+</metadata>
