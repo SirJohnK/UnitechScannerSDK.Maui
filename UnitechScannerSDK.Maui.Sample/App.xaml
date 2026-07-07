@@ -15,6 +15,7 @@
 
             <!--  CONVERTERS  -->
             <mct:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+            <local:MacAddressConverter x:Key="MacAddressConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>
