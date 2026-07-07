@@ -1,6 +1,6 @@
 ﻿namespace UnitechScannerSDK;
 
-public interface IScannerService
+public interface IScannerSDK
 {
     event EventHandler<BarcodeData>? BarcodeScanned;
 
@@ -12,7 +12,13 @@ public interface IScannerService
 
     event EventHandler<UnitechDevice>? DeviceFound;
 
+    event EventHandler<UnitechDevice>? PairedDeviceFound;
+
+    event EventHandler<UnitechDevice>? DevicePaired;
+
     event EventHandler? DiscoveryFinished;
+
+    UnitechScannerSDKOptions Options { get; }
 
     Task<bool> ConnectAsync(UnitechDevice device, TimeSpan? timeout = null);
 
@@ -21,4 +27,6 @@ public interface IScannerService
     void StartDiscovery(bool keepDetecting = false);
 
     void StopDiscovery();
+
+    string GetPairingBarcode(string? macAdress = null);
 }

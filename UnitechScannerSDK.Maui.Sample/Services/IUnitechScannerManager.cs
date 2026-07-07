@@ -28,6 +28,11 @@ public interface IUnitechScannerManager : IDisposable
     event EventHandler<IUnitechScanner>? Appeared;
 
     /// <summary>
+    /// Event Invoked when Scanner Paired.
+    /// </summary>
+    event EventHandler<IUnitechScanner>? Paired;
+
+    /// <summary>
     /// Event Invoked when Barcode being Scanned.
     /// </summary>
     event EventHandler<BarcodeData>? BarcodeScanned;

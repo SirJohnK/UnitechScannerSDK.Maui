@@ -1,7 +1,9 @@
 ﻿namespace UnitechScannerSDK;
 
-public sealed partial class ScannerService : IScannerService
+public sealed partial class ScannerSDK(UnitechScannerSDKOptions options) : IScannerSDK
 {
+    public UnitechScannerSDKOptions Options => options;
+
     public Task<bool> ConnectAsync(UnitechDevice device, TimeSpan? timeout = null)
     {
         throw new NotImplementedException();
@@ -18,6 +20,11 @@ public sealed partial class ScannerService : IScannerService
     }
 
     public void StopDiscovery()
+    {
+        throw new NotImplementedException();
+    }
+
+    public string GetPairingBarcode(string? macAdress = null)
     {
         throw new NotImplementedException();
     }

@@ -21,7 +21,12 @@ namespace UnitechScannerSDK.Maui.Sample
                 });
 
             //Add Services
-            builder.Services.AddUnitechScannerSDK();
+            builder.Services.AddUnitechScannerSDK(config =>
+            {
+                config.IsMacAddressRequired = true;
+                config.DataTerminator.Value = DataTerminatorParam.None;
+                config.BeeperVolume.Value = BeeperVolumeParam.Low;
+            });
             builder.Services.AddSingleton<IUnitechScannerManager, UnitechScannerManager>();
 
             //Add Views

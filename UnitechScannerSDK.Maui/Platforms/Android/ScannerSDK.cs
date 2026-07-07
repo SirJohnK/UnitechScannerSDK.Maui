@@ -2,12 +2,14 @@ using Android.Content;
 using Com.Unitech.Lib.Detect;
 using Com.Unitech.Lib.Event;
 using Com.Unitech.Lib.Event.Scanner;
+using Com.Unitech.Lib.Model.Scanner;
 using Com.Unitech.Lib.Reader;
 using Com.Unitech.Lib.Types;
+using System.Security.Cryptography;
 using UnitechScannerSDK.Platforms.Android;
-using UnitechConnectState = Com.Unitech.Lib.Types.ConnectState;
-using UnitechBatteryState = Com.Unitech.Lib.Types.BatteryState;
 using UnitechBarcodeID = Com.Unitech.Lib.Types.Scanner.BarcodeID;
+using UnitechBatteryState = Com.Unitech.Lib.Types.BatteryState;
+using UnitechConnectState = Com.Unitech.Lib.Types.ConnectState;
 
 namespace UnitechScannerSDK;
 
@@ -15,13 +17,14 @@ namespace UnitechScannerSDK;
 /// Wraps the Unitech Scanner SDK binding with a clean, event-driven API
 /// for use from a .NET MAUI application.
 /// </summary>
-public sealed partial class ScannerService : Java.Lang.Object,
+public sealed partial class ScannerSDK(UnitechScannerSDKOptions options) : Java.Lang.Object,
     IDetectReaderEventListener,
     IReaderEventListener,
     IBarcodeEventListener,
-    IScannerService
+    IParameterEventListener,
+    IScannerSDK
 {
-    private readonly Context _context;
+    private readonly Context _context = Application.Context;
     private DetectReader? _detector;
     private BarcodeReader? _reader;
 
@@ -32,10 +35,7 @@ public sealed partial class ScannerService : Java.Lang.Object,
     private TaskCompletionSource<bool>? _stateWaiter;
     private ConnectState? _awaitedState;
 
-    public ScannerService()
-    {
-        _context = Application.Context;
-    }
+    public UnitechScannerSDKOptions Options => options;
 
     // -------------------------------------------------------------------------
     // Discovery
@@ -178,10 +178,10 @@ public sealed partial class ScannerService : Java.Lang.Object,
     { if (device is not null) DeviceFound?.Invoke(this, device.ToAppModel()); }
 
     public void OnDetectPairedReader(Com.Unitech.Lib.Detect.UnitechDevice? device)
-    { if (device is not null) DeviceFound?.Invoke(this, device.ToAppModel()); }
+    { if (device is not null) PairedDeviceFound?.Invoke(this, device.ToAppModel()); }
 
     public void OnDetectNewPairedReader(Com.Unitech.Lib.Detect.UnitechDevice? device)
-    { if (device is not null) DeviceFound?.Invoke(this, device.ToAppModel()); }
+    { if (device is not null) DevicePaired?.Invoke(this, device.ToAppModel()); }
 
     public void OnDetectFinished() =>
         DiscoveryFinished?.Invoke(this, EventArgs.Empty);
@@ -203,6 +203,12 @@ public sealed partial class ScannerService : Java.Lang.Object,
                 // be registered here — registering earlier silently no-ops and no
                 // BarcodeEvent (and therefore no BarcodeScanned) is ever raised.
                 reader?.BaseEngine?.AddListener(this);
+
+                // Apply the configured options to the reader. This is done here rather than
+                // earlier to ensure the reader is fully initialized.
+                var barcodeReader = reader as BarcodeReader;
+                barcodeReader?.SetParameter(new DeviceParam(options.DataTerminator.Param.ToNativeModel(), options.DataTerminator.Value.ToNativeModel()), this);
+                barcodeReader?.SetParameter(new DeviceParam(options.BeeperVolume.Param.ToNativeModel(), options.BeeperVolume.Value.ToNativeModel()), this);
             }
 
             // Release any ConnectAsync/DisconnectAsync awaiting this state.
@@ -248,6 +254,32 @@ public sealed partial class ScannerService : Java.Lang.Object,
         }
     }
 
+    /// <summary>
+    /// Generates a barcode image used for device pairing.
+    /// </summary>
+    /// <param name="macAdress">The MAC address of the device to pair, or null to use the default device. If specified, must be a valid MAC address format.</param>
+    /// <returns>
+    /// An ImageSource representing the pairing barcode, or null if the barcode could not be generated.
+    /// </returns>
+    public string GetPairingBarcode(string? macAdress = null)
+    {
+        //Verify Mac Address Requirement
+        if (options.IsMacAddressRequired)
+        {
+            //Mac Address Supplied?
+            if (string.IsNullOrEmpty(macAdress)) throw new ArgumentNullException(nameof(macAdress), "GetPairingBarcode: Mac address is required!");
+
+            //Get Pairing Barcode with Mac Address
+            return $"SPP{macAdress?.Replace(":", "").ToUpper()}";
+        }
+        else
+        {
+            //Get Rapd Pairing Barcode
+            var identifier = new string([.. Enumerable.Range(0, 12).Select(_ => "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[RandomNumberGenerator.GetInt32(36)])]);
+            return $"//.STC{identifier}";
+        }
+    }
+
     // -------------------------------------------------------------------------
     // Cleanup
     // -------------------------------------------------------------------------
@@ -267,5 +299,22 @@ public sealed partial class ScannerService : Java.Lang.Object,
             _reader = null;
         }
         base.Dispose(disposing);
+    }
+
+    public void OnFail(int id, ResultCode? result)
+    {
+        var paramId = id;
+        var resultCode = result;
+    }
+
+    public void OnFinish(int id)
+    {
+        var paramId = id;
+    }
+
+    public void OnReceive(int id, BaseParam? param)
+    {
+        var paramId = id;
+        var baseParam = param;
     }
 }

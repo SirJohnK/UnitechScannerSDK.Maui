@@ -27,14 +27,8 @@ public partial class ScannerPairingPopupViewModel(IUnitechScannerManager scanner
     private string? pairingBarcode;
 
     public bool IsMacAddressRequired => scannerManager.IsMacAddressRequired;
-
-    //public ImageSource SetFactoryDefaultsBarcode => ImageSource.FromStream(() => ScannerSDK.SetFactoryDefaultsBarcode);
-    //public ImageSource HostTriggerEventModeEnabledBarcode => ImageSource.FromStream(() => ScannerSDK.HostTriggerEventModeEnabledBarcode);
-    //public ImageSource HostTriggerEventModeDisabledBarcode => ImageSource.FromStream(() => ScannerSDK.HostTriggerEventModeDisabledBarcode);
-
-    public ImageSource? SetFactoryDefaultsBarcode => null;
-    public ImageSource? HostTriggerEventModeEnabledBarcode => null;
-    public ImageSource? HostTriggerEventModeDisabledBarcode => null;
+    public string SetFactoryDefaultsBarcode => ".A001$";
+    public string SetBTSPPBarcode => ".E042$";
 
     private async Task<string?> GetBluetoothMacAddress(string? inputAddress = null, bool forceDialog = false)
     {
@@ -67,6 +61,7 @@ public partial class ScannerPairingPopupViewModel(IUnitechScannerManager scanner
         //Subscribe to Scanner Events
         scannerManager.Connected += ScannerConnected;
         scannerManager.Appeared += ScannerAppeared;
+        scannerManager.Paired += ScannerPaired;
 
         //Check if Bluetooth Mac Address is required
         if (scannerManager.IsMacAddressRequired)
@@ -79,6 +74,15 @@ public partial class ScannerPairingPopupViewModel(IUnitechScannerManager scanner
         //Get Pairing Barcode
         if (!scannerManager.IsMacAddressRequired || !string.IsNullOrWhiteSpace(MacAddress))
             PairingBarcode = scannerManager.GetPairingBarcode(MacAddress);
+    }
+
+    private void ScannerPaired(object? sender, IUnitechScanner scanner)
+    {
+        if (scannerManager.IsMacAddressRequired)
+        {
+            scannerManager.DisableDetection();
+            scanner.Connect().SafeFireAndForget();
+        }
     }
 
     private void ScannerAppeared(object? sender, IUnitechScanner scanner)

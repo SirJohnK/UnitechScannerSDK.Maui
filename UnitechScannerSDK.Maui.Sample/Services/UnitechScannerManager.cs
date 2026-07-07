@@ -12,13 +12,18 @@ namespace UnitechScannerSDK.Maui.Sample;
 /// </remarks>
 public class UnitechScannerManager : IUnitechScannerManager, IDisposable
 {
-    private readonly IScannerService scannerService;
+    private readonly IScannerSDK scannerSDK;
     private readonly IDictionary<string, IUnitechScanner> scanners;
 
     /// <summary>
     /// Event Invoked when Scanner Appears.
     /// </summary>
     public event EventHandler<IUnitechScanner>? Appeared;
+
+    /// <summary>
+    /// Event Invoked when Scanner Paired.
+    /// </summary>
+    public event EventHandler<IUnitechScanner>? Paired;
 
     /// <summary>
     /// Event Invoked when Barcode being Scanned.
@@ -35,21 +40,33 @@ public class UnitechScannerManager : IUnitechScannerManager, IDisposable
     /// </summary>
     public event EventHandler<string>? Disconnected;
 
-    public UnitechScannerManager(IScannerService scannerService)
+    public UnitechScannerManager(IScannerSDK scannerSDK)
     {
         //Init
-        this.scannerService = scannerService;
+        this.scannerSDK = scannerSDK;
         scanners = new Dictionary<string, IUnitechScanner>();
 
         //Setup Event handlers
-        scannerService.BarcodeScanned += ScannerBarcodeData;
-        scannerService.DeviceFound += ScannerAppeared;
-        scannerService.ConnectionChanged += ConnectionChanged;
+        scannerSDK.BarcodeScanned += ScannerBarcodeData;
+        scannerSDK.DeviceFound += ScannerAppeared;
+        scannerSDK.PairedDeviceFound += ScannerAppeared;
+        scannerSDK.DevicePaired += ScannerPaired;
+        scannerSDK.ConnectionChanged += ConnectionChanged;
+    }
+
+    private void ScannerPaired(object? sender, UnitechDevice device)
+    {
+        //Update scanners dictionary
+        var scanner = new UnitechScanner(device, scannerSDK);
+        scanners[scanner.Id] = scanner;
+
+        //Invoke Paired Event
+        Paired?.Invoke(this, scanner);
     }
 
     private void ConnectionChanged(object? sender, (ConnectState State, UnitechDevice Device) e)
     {
-        var scanner = new UnitechScanner(e.Device, scannerService);
+        var scanner = new UnitechScanner(e.Device, scannerSDK);
         if (e.State == ConnectState.Connected)
         {
             scanner.IsConnected = true;
@@ -66,7 +83,7 @@ public class UnitechScannerManager : IUnitechScannerManager, IDisposable
     private void ScannerAppeared(object? sender, UnitechDevice device)
     {
         //Update scanners dictionary
-        var scanner = new UnitechScanner(device, scannerService);
+        var scanner = new UnitechScanner(device, scannerSDK);
         scanners[scanner.Id] = scanner;
 
         //Invoke Appeared Event
@@ -80,9 +97,9 @@ public class UnitechScannerManager : IUnitechScannerManager, IDisposable
     }
 
     /// <summary>
-    /// Gets a value indicating whether a MAC address is required for generating a pairing barcode.
+    /// Gets or Sets a value indicating whether a MAC address is required for generating a pairing barcode.
     /// </summary>
-    public bool IsMacAddressRequired { get; } = false;
+    public bool IsMacAddressRequired => scannerSDK.Options.IsMacAddressRequired;
 
     /// <summary>
     /// Generates a barcode image used for device pairing.
@@ -91,31 +108,14 @@ public class UnitechScannerManager : IUnitechScannerManager, IDisposable
     /// <returns>
     /// An ImageSource representing the pairing barcode, or null if the barcode could not be generated.
     /// </returns>
-    public string GetPairingBarcode(string? macAdress = null)
-    {
-        //Verify Mac Address Requirement
-        if (IsMacAddressRequired)
-        {
-            //Mac Address Supplied?
-            if (string.IsNullOrEmpty(macAdress)) throw new ArgumentNullException(nameof(macAdress), "GetPairingBarcode: Mac address is required!");
-
-            //Get Pairing Barcode with Mac Address
-            return $"//.USU{macAdress?.Replace(":", "").ToUpper()}";
-        }
-        else
-        {
-            //Get Rapd Pairing Barcode
-            var identifier = new string([.. Enumerable.Range(0, 12).Select(_ => "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[RandomNumberGenerator.GetInt32(36)])]);
-            return $"//.STC{identifier}";
-        }
-    }
+    public string GetPairingBarcode(string? macAdress = null) => scannerSDK.GetPairingBarcode(macAdress);
 
     /// <summary>
     /// Enables scanner detection and will trigger scanner events.
     /// </summary>
     public void EnableDetection(bool keepDetecting = false)
     {
-        scannerService.StartDiscovery(keepDetecting);
+        scannerSDK.StartDiscovery(keepDetecting);
     }
 
     /// <summary>
@@ -123,15 +123,17 @@ public class UnitechScannerManager : IUnitechScannerManager, IDisposable
     /// </summary>
     public void DisableDetection()
     {
-        scannerService.StopDiscovery();
+        scannerSDK.StopDiscovery();
     }
 
     public void Dispose()
     {
         //Clean up
         DisableDetection();
-        scannerService.BarcodeScanned -= ScannerBarcodeData;
-        scannerService.DeviceFound -= ScannerAppeared;
-        scannerService.ConnectionChanged -= ConnectionChanged;
+        scannerSDK.BarcodeScanned -= ScannerBarcodeData;
+        scannerSDK.DeviceFound -= ScannerAppeared;
+        scannerSDK.PairedDeviceFound -= ScannerAppeared;
+        scannerSDK.DevicePaired -= ScannerPaired;
+        scannerSDK.ConnectionChanged -= ConnectionChanged;
     }
 }

@@ -9,7 +9,7 @@ namespace UnitechScannerSDK.Maui.Sample;
 /// This class serves as a high-level abstraction for interacting with Unitech Technologies barcode
 /// scanners. It exposes device information and connection management functionality.
 /// </remarks>
-public partial class UnitechScanner(UnitechDevice device, IScannerService scannerService) : ObservableObject, IUnitechScanner
+public partial class UnitechScanner(UnitechDevice device, IScannerSDK scannerSDK) : ObservableObject, IUnitechScanner
 {
     public string Id => device.Address ?? "11:22:33:44:55:66";
 
@@ -31,7 +31,7 @@ public partial class UnitechScanner(UnitechDevice device, IScannerService scanne
         try
         {
             //Attempt to Connect to Scanner!
-            return IsConnected = await scannerService.ConnectAsync(device);
+            return IsConnected = await scannerSDK.ConnectAsync(device);
         }
         catch (Exception)
         {
@@ -45,7 +45,7 @@ public partial class UnitechScanner(UnitechDevice device, IScannerService scanne
         try
         {
             //Attempt to Disconnect from Scanner!
-            return IsConnected = !await scannerService.DisconnectAsync();
+            return IsConnected = !await scannerSDK.DisconnectAsync();
         }
         catch (Exception)
         {

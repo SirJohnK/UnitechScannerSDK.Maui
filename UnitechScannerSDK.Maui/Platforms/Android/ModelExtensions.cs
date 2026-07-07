@@ -1,4 +1,8 @@
-﻿namespace UnitechScannerSDK.Platforms.Android;
+﻿using Android.OS;
+using Com.Unitech.Lib.Model.Scanner;
+using Com.Unitech.Lib.Types.Scanner;
+
+namespace UnitechScannerSDK.Platforms.Android;
 
 internal static class ModelExtensions
 {
@@ -341,5 +345,74 @@ internal static class ModelExtensions
             return BarcodeID.KIXPost;
 
         return BarcodeID.Unknown;
+    }
+
+    internal static Com.Unitech.Lib.Types.Scanner.DeviceParamID? ToNativeModel(this DeviceParamID deviceParam)
+    {
+        return deviceParam switch
+        {
+            DeviceParamID.AutoConnecting => Com.Unitech.Lib.Types.Scanner.DeviceParamID.AutoConnecting,
+            DeviceParamID.AutoPowerOff => Com.Unitech.Lib.Types.Scanner.DeviceParamID.AutoPowerOff,
+            DeviceParamID.BatteryStatus => Com.Unitech.Lib.Types.Scanner.DeviceParamID.BatteryStatus,
+            DeviceParamID.BeeperVolume => Com.Unitech.Lib.Types.Scanner.DeviceParamID.BeeperVolume,
+            DeviceParamID.BluetoothMAC => Com.Unitech.Lib.Types.Scanner.DeviceParamID.BluetoothMAC,
+            DeviceParamID.BluetoothName => Com.Unitech.Lib.Types.Scanner.DeviceParamID.BluetoothName,
+            DeviceParamID.BluetoothSignalCheckingLevel => Com.Unitech.Lib.Types.Scanner.DeviceParamID.BluetoothSignalCheckingLevel,
+            DeviceParamID.ControlCharacterFilter => Com.Unitech.Lib.Types.Scanner.DeviceParamID.ControlCharacterFilter,
+            DeviceParamID.CradleAutoPair => Com.Unitech.Lib.Types.Scanner.DeviceParamID.CradleAutoPair,
+            DeviceParamID.CradleAutoPresentationMode => Com.Unitech.Lib.Types.Scanner.DeviceParamID.CradleAutoPresentationMode,
+            DeviceParamID.DataIndicator => Com.Unitech.Lib.Types.Scanner.DeviceParamID.DataIndicator,
+            DeviceParamID.DataSendingInterBlockDelay => Com.Unitech.Lib.Types.Scanner.DeviceParamID.DataSendingInterBlockDelay,
+            DeviceParamID.DataTerminator => Com.Unitech.Lib.Types.Scanner.DeviceParamID.DataTerminator,
+            DeviceParamID.EndOfBatchSendingMessage => Com.Unitech.Lib.Types.Scanner.DeviceParamID.EndOfBatchSendingMessage,
+            DeviceParamID.EngineModel => Com.Unitech.Lib.Types.Scanner.DeviceParamID.EngineModel,
+            DeviceParamID.EngineVersion => Com.Unitech.Lib.Types.Scanner.DeviceParamID.EngineVersion,
+            DeviceParamID.FindReplace => Com.Unitech.Lib.Types.Scanner.DeviceParamID.FindReplace,
+            DeviceParamID.Firmware => Com.Unitech.Lib.Types.Scanner.DeviceParamID.Firmware,
+            DeviceParamID.Gs1AI => Com.Unitech.Lib.Types.Scanner.DeviceParamID.Gs1AI,
+            DeviceParamID.HidEncoding => Com.Unitech.Lib.Types.Scanner.DeviceParamID.HidEncoding,
+            DeviceParamID.HidInterCharacterDelay => Com.Unitech.Lib.Types.Scanner.DeviceParamID.HidInterCharacterDelay,
+            DeviceParamID.HidKeyboardCase => Com.Unitech.Lib.Types.Scanner.DeviceParamID.HidKeyboardCase,
+            DeviceParamID.HidKeyboardLanguage => Com.Unitech.Lib.Types.Scanner.DeviceParamID.HidKeyboardLanguage,
+            DeviceParamID.HidOutputType => Com.Unitech.Lib.Types.Scanner.DeviceParamID.HidOutputType,
+            DeviceParamID.Indicator => Com.Unitech.Lib.Types.Scanner.DeviceParamID.Indicator,
+            DeviceParamID.LedControl => Com.Unitech.Lib.Types.Scanner.DeviceParamID.LedControl,
+            DeviceParamID.OperationMode => Com.Unitech.Lib.Types.Scanner.DeviceParamID.OperationMode,
+            DeviceParamID.Reset => Com.Unitech.Lib.Types.Scanner.DeviceParamID.Reset,
+            DeviceParamID.SaveBufferWhilePowerOff => Com.Unitech.Lib.Types.Scanner.DeviceParamID.SaveBufferWhilePowerOff,
+            DeviceParamID.ScannerIndicator => Com.Unitech.Lib.Types.Scanner.DeviceParamID.ScannerIndicator,
+            DeviceParamID.SerialNumber => Com.Unitech.Lib.Types.Scanner.DeviceParamID.SerialNumber,
+            DeviceParamID.SettingByLabel => Com.Unitech.Lib.Types.Scanner.DeviceParamID.SettingByLabel,
+            DeviceParamID.StartDecode => Com.Unitech.Lib.Types.Scanner.DeviceParamID.StartDecode,
+            DeviceParamID.StopDecode => Com.Unitech.Lib.Types.Scanner.DeviceParamID.StopDecode,
+            DeviceParamID.TriggerKeyStatus => Com.Unitech.Lib.Types.Scanner.DeviceParamID.TriggerKeyStatus,
+            DeviceParamID.UnpairBluetooth => Com.Unitech.Lib.Types.Scanner.DeviceParamID.UnpairBluetooth,
+            DeviceParamID.Vibrator => Com.Unitech.Lib.Types.Scanner.DeviceParamID.Vibrator,
+            _ => null
+        };
+    }
+
+    internal static BeeperVolume? ToNativeModel(this BeeperVolumeParam beeperVolume)
+    {
+        return beeperVolume switch
+        {
+            BeeperVolumeParam.Mute => BeeperVolume.Mute,
+            BeeperVolumeParam.Low => BeeperVolume.Low,
+            BeeperVolumeParam.Medium => BeeperVolume.Medium,
+            BeeperVolumeParam.High => BeeperVolume.High,
+            _ => BeeperVolume.High
+        };
+    }
+
+    internal static DataTerminator? ToNativeModel(this DataTerminatorParam dataTerminator)
+    {
+        return dataTerminator switch
+        {
+            DataTerminatorParam.None => DataTerminator.None,
+            DataTerminatorParam.CR => DataTerminator.Cr,
+            DataTerminatorParam.LF => DataTerminator.Lf,
+            DataTerminatorParam.CRLF => DataTerminator.Crlf,
+            _ => DataTerminator.None
+        };
     }
 }

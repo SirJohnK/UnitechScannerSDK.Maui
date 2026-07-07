@@ -1,6 +1,6 @@
 ﻿namespace UnitechScannerSDK;
 
-public sealed partial class ScannerService
+public sealed partial class ScannerSDK
 {
     public event EventHandler<BarcodeData>? BarcodeScanned;
 
@@ -11,6 +11,10 @@ public sealed partial class ScannerService
     public event EventHandler<(ConnectState State, UnitechDevice Device)>? ConnectionChanged;
 
     public event EventHandler<UnitechDevice>? DeviceFound;
+
+    public event EventHandler<UnitechDevice>? PairedDeviceFound;
+
+    public event EventHandler<UnitechDevice>? DevicePaired;
 
     public event EventHandler? DiscoveryFinished;
 }

@@ -58,11 +58,14 @@
             Grid.Column="2"
             Margin="0"
             Padding="0">
-            <Image
-                Aspect="Fill"
+            <zxing:BarcodeGeneratorView
+                BarcodeMargin="1"
+                CharacterSet="UTF-8"
+                Format="Code39"
                 HeightRequest="50"
                 HorizontalOptions="Fill"
-                Source="{Binding SetFactoryDefaultsBarcode}" />
+                VerticalOptions="Center"
+                Value="{Binding SetFactoryDefaultsBarcode}" />
 
             <Label
                 FontSize="Micro"
@@ -75,8 +78,7 @@
             Grid.Row="3"
             Grid.Column="0"
             HorizontalOptions="Center"
-            IsVisible="{OnPlatform Android=False,
-                                   iOS=True}"
+            IsVisible="{Binding IsMacAddressRequired, Converter={StaticResource InvertedBoolConverter}}"
             VerticalOptions="Start">
             <Image.Source>
                 <FontImageSource
@@ -92,18 +94,20 @@
             Grid.Column="2"
             Margin="0"
             Padding="0"
-            IsVisible="{OnPlatform Android=False,
-                                   iOS=True}">
-            <Image
-                Aspect="Fill"
+            IsVisible="{Binding IsMacAddressRequired, Converter={StaticResource InvertedBoolConverter}}">
+            <zxing:BarcodeGeneratorView
+                BarcodeMargin="1"
+                CharacterSet="UTF-8"
+                Format="Code39"
                 HeightRequest="50"
                 HorizontalOptions="Fill"
-                Source="{Binding HostTriggerEventModeDisabledBarcode}" />
+                VerticalOptions="Center"
+                Value="{Binding SetBTSPPBarcode}" />
 
             <Label
                 FontSize="Micro"
                 HorizontalOptions="Center"
-                Text="Host trigger event mode disabled"
+                Text="Set Bluetooth SPP Mode"
                 TextColor="DarkGray" />
         </VerticalStackLayout>
 
@@ -115,11 +119,26 @@
             <Image.Source>
                 <FontImageSource
                     FontFamily="MaterialFontFamily"
-                    Glyph="{OnPlatform Android={x:Static app:MaterialDesignIcons.Numeric2CircleOutline},
-                                       iOS={x:Static app:MaterialDesignIcons.Numeric3CircleOutline}}"
+                    Glyph="{x:Static app:MaterialDesignIcons.Numeric2CircleOutline}"
                     Size="40"
                     Color="Black" />
             </Image.Source>
+            <Image.Triggers>
+                <DataTrigger
+                    Binding="{Binding IsMacAddressRequired}"
+                    TargetType="Image"
+                    Value="false">
+                    <Setter Property="Source">
+                        <Setter.Value>
+                            <FontImageSource
+                                FontFamily="MaterialFontFamily"
+                                Glyph="{x:Static app:MaterialDesignIcons.Numeric3CircleOutline}"
+                                Size="40"
+                                Color="Black" />
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+            </Image.Triggers>
         </Image>
 
         <VerticalStackLayout
@@ -132,9 +151,8 @@
                 CharacterSet="UTF-8"
                 Format="QrCode"
                 HeightRequest="100"
-                HorizontalOptions="Center"
+                HorizontalOptions="Fill"
                 VerticalOptions="Center"
-                WidthRequest="100"
                 Value="{Binding PairingBarcode}" />
 
             <Label

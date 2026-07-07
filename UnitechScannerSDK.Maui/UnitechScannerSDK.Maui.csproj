@@ -1,17 +1,35 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<TargetFrameworks>net10.0;net10.0-android;net10.0-ios</TargetFrameworks>
-		<SingleProject>true</SingleProject>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
+  <PropertyGroup>
+    <TargetFrameworks>net10.0;net10.0-android</TargetFrameworks>
+    <SingleProject>true</SingleProject>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
     <RootNamespace>UnitechScannerSDK</RootNamespace>
 
-    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">14.2</SupportedOSPlatformVersion>
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
-		<PackageIcon>sirjohnk.png</PackageIcon>
-	</PropertyGroup>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">28.0</SupportedOSPlatformVersion>
+
+    <PackageIcon>sirjohnk.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Copyright>Copyright (c) 2026 Johan Svensson</Copyright>
+    <Title>UnitechScannerSDK.Maui</Title>
+    <Description>Enhanced .NET MAUI version of the Unitech Scanner SDK.</Description>
+    <PackageProjectUrl>https://github.com/SirJohnK/UnitechScannerSDK.Maui</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/SirJohnK/UnitechScannerSDK.Maui</RepositoryUrl>
+    <PackageReleaseNotes>- Add UnitechScannerSDKOptions
+- Add DeviceParam handling
+- Rename ScannerService to ScannerSDK
+- Add Package configuration
+- Add PairedDeviceFound and DevicePaired events
+- Add GetPairingBarcode method
+- Remove iOS</PackageReleaseNotes>
+    <PackageTags>dotnet;dotnetmaui;unitech;scanner;sdk</PackageTags>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <Version>1.0.0-prerelease.2</Version>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+  </PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="Platforms\**\*.cs" />
@@ -24,13 +42,19 @@
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-android'">
     <Compile Include="Platforms\Android\**\*.cs" />
-    <ProjectReference Include="..\Unitech.Scanner.Binding\Unitech.Scanner.Binding.csproj" />
+    <ProjectReference Include="..\Unitech.Scanner.Binding\Unitech.Scanner.Binding.csproj" PrivateAssets="all" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-ios'">
-    <Compile Include="Platforms\iOS\**\*.cs" />
-    <PackageReference Include="unitech.scannersdkbinding" Version="1.0. 19" />
-  </ItemGroup>
+  <PropertyGroup>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludeProjectReferenceAsDll</TargetsForTfmSpecificBuildOutput>
+  </PropertyGroup>
+
+  <Target Name="IncludeProjectReferenceAsDll" DependsOnTargets="ResolveReferences">
+    <ItemGroup>
+      <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths-&gt;WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))" />
+      <TfmSpecificPackageFile Include="..\Unitech.Scanner.Binding\Jars\ScannerSDK_v1_2_0_2.aar" PackagePath="lib\net10.0-android36.0\" />
+    </ItemGroup>
+  </Target>
 
   <ItemGroup>
     <None Include="..\LICENSE.txt">
@@ -41,11 +65,10 @@
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
-    <None Include="..\README.md" Pack="true" PackagePath="" Link="README.md" />
+    <None Include="..\README.md" Pack="true" PackagePath="\" Link="README.md" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.9" />
   </ItemGroup>
-
 </Project>
