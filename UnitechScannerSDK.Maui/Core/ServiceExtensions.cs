@@ -20,7 +20,7 @@ public class UnitechScannerSDKOptions
     /// <summary>
     /// Gets or Sets a value indicating whether a MAC address is required for generating a pairing barcode. (Default: true)
     /// </summary>
-    public bool IsMacAddressRequired { get; set; } = false;
+    public bool IsMacAddressRequired { get; set; } = true;
 
     public DeviceParam<DataTerminatorParam> DataTerminator { get; } = DeviceParam<DataTerminatorParam>.Create(DeviceParamID.DataTerminator, DataTerminatorParam.None);
 
