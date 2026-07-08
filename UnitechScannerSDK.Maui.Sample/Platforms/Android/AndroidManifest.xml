@@ -12,8 +12,5 @@
                    android:usesPermissionFlags="neverForLocation" />
   <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
 
-  <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-  <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-
-  <uses-sdk tools:overrideLibrary="com.unitech.scanner" />
+  <uses-sdk android:minSdkVersion="24" android:targetSdkVersion="36" tools:overrideLibrary="com.unitech.scanner" />
 </manifest>

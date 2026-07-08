@@ -38,11 +38,14 @@ public partial class MainViewModel : ObservableObject
 
     public async Task OnAppearingAsync()
     {
-        //Ensure Permissions is Granted!
-        var status = await Permissions.CheckStatusAsync<Permissions.Bluetooth>();
-        if (status != PermissionStatus.Granted)
+        // BLUETOOTH_SCAN/CONNECT are runtime permissions on Android 12+ (API 31). They
+        // must be granted before starting discovery, otherwise the native
+        // BluetoothAdapter.startDiscovery() throws a fatal SecurityException on the main
+        // thread. Bail out (rather than crash) if the user declines.
+        if (!await BluetoothPermissions.EnsureGrantedAsync())
         {
-            status = await Permissions.RequestAsync<Permissions.Bluetooth>();
+            ScannerEvents += "Bluetooth permission denied — scanner detection disabled." + Environment.NewLine;
+            return;
         }
 
         //Subscribe to Scanner Detection Events

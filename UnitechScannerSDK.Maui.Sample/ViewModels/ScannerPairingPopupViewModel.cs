@@ -55,6 +55,11 @@ public partial class ScannerPairingPopupViewModel(IUnitechScannerManager scanner
 
     public async Task OnLoadedAsync()
     {
+        // Discovery requires the runtime BLUETOOTH_SCAN permission (Android 12+); without
+        // it startDiscovery() throws a fatal SecurityException.
+        if (!await BluetoothPermissions.EnsureGrantedAsync())
+            return;
+
         //Enable Detection
         scannerManager.EnableDetection(true);
 

@@ -1,0 +1,9 @@
+# Consumer R8/ProGuard keep rules for the Unitech Scanner SDK.
+# Embedded at the root of ScannerSDK_v1_2_0_2.aar so that any app consuming the
+# Unitech.Scanner.Binding / UnitechScannerSDK.Maui NuGet automatically keeps these
+# classes. The SDK reaches its own types via JNI/reflection; without these rules R8
+# strips or renames them in Release builds and the app crashes on connect.
+-keep class com.unitech.** { *; }
+-keep interface com.unitech.** { *; }
+-keepclassmembers class com.unitech.** { *; }
+-dontwarn com.unitech.**
