@@ -30,13 +30,28 @@
             Text="Scanner"
             TextColor="Black" />
 
+        <Image
+           Grid.Row="0"
+           Grid.Column="1"
+           HorizontalOptions="End"
+           VerticalOptions="Center">
+            <Image.Source>
+                <FontImageSource
+                   FontFamily="MaterialFontFamily"
+                   Glyph="{x:Static app:MaterialDesignIcons.CellphoneNfc}"
+                   Size="25"
+                   Color="Black" />
+            </Image.Source>
+        </Image>
+
         <Label
             Grid.Row="1"
             Grid.Column="0"
             Grid.ColumnSpan="2"
             FontSize="Small"
             HorizontalOptions="Center"
-            Text="Scan barcodes and wait for connection."
+            LineBreakMode="WordWrap"
+            Text="Use NFC OR Scan barcodes and wait for connection."
             TextColor="Black" />
 
         <Image

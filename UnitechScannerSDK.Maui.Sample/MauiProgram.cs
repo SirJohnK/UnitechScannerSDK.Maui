@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
+using Plugin.NFC.Hosting;
 using ZXing.Net.Maui;
 
 namespace UnitechScannerSDK.Maui.Sample
@@ -13,6 +14,7 @@ namespace UnitechScannerSDK.Maui.Sample
                 .UseMauiApp<App>()
                 .UseMauiCommunityToolkit()
                 .UseBarcodeGenerator()
+                .UseNfc()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("materialdesignicons-webfont.ttf", "MaterialFontFamily");

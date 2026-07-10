@@ -27,7 +27,7 @@
     <PackageTags>dotnet;dotnetmaui;unitech;scanner;sdk</PackageTags>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-    <Version>1.0.0-prerelease.2</Version>
+    <Version>1.0.0-prerelease.3</Version>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
 

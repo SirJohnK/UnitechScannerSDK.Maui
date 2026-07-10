@@ -2,6 +2,7 @@
 using CommunityToolkit.Maui;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Plugin.NFC;
 
 namespace UnitechScannerSDK.Maui.Sample;
 
@@ -16,7 +17,7 @@ namespace UnitechScannerSDK.Maui.Sample;
 /// when loaded and ensures proper cleanup when unloaded.</remarks>
 /// <param name="scannerManager">The scanner manager used to control scanner detection and retrieve pairing barcodes.</param>
 /// <param name="popupService">The popup service used to display dialogs and manage popup interactions.</param>
-public partial class ScannerPairingPopupViewModel(IUnitechScannerManager scannerManager, IPopupService popupService) : ObservableObject
+public partial class ScannerPairingPopupViewModel(IUnitechScannerManager scannerManager, INFC nfc, IPopupService popupService) : ObservableObject
 {
     private const string BluetoothMacAddress = nameof(BluetoothMacAddress);
 
@@ -26,6 +27,7 @@ public partial class ScannerPairingPopupViewModel(IUnitechScannerManager scanner
     [ObservableProperty]
     private string? pairingBarcode;
 
+    private string? deviceMacAddress = null;
     public bool IsMacAddressRequired => scannerManager.IsMacAddressRequired;
     public string SetFactoryDefaultsBarcode => ".A001$";
     public string SetBTSPPBarcode => ".E042$";
@@ -79,6 +81,49 @@ public partial class ScannerPairingPopupViewModel(IUnitechScannerManager scanner
         //Get Pairing Barcode
         if (!scannerManager.IsMacAddressRequired || !string.IsNullOrWhiteSpace(MacAddress))
             PairingBarcode = scannerManager.GetPairingBarcode(MacAddress);
+
+        //Start NFC Listening, if supported
+        if (nfc.IsAvailable && nfc.IsEnabled)
+        {
+            nfc.OnMessageReceived += Nfc_OnMessageReceived;
+            nfc.StartListening();
+        }
+    }
+
+    private void Nfc_OnMessageReceived(ITagInfo tagInfo)
+    {
+        // 0. Clear device mac address
+        deviceMacAddress = null;
+
+        // 1. Verify if the tag contains readable records
+        if (tagInfo == null || tagInfo.Records == null || tagInfo.Records.Length == 0) return;
+
+        // 2. Find the MAC address payload
+        var macRecord = tagInfo.Records.FirstOrDefault(record => record.TypeFormat == NFCNdefTypeFormat.Mime && record.MimeType == "application/vnd.bluetooth.ep.oob");
+        if (macRecord is not null)
+        {
+            // 3. Fetch the raw binary data
+            var payload = macRecord.Payload;
+            // Must have at least 2 bytes (length) + 6 bytes (MAC)
+            if (payload is null || payload.Length < 8) return;
+
+            // 4. Extract the 6 MAC address bytes (starting at offset index 2)
+            byte[] macBytes = new byte[6];
+            Array.Copy(payload, 2, macBytes, 0, 6);
+
+            // 5. Reverse the array because Bluetooth OOB stores BD_ADDR in Little-Endian
+            Array.Reverse(macBytes);
+
+            // 6. Format into standard DC:0D:30:27:52:DB string presentation
+            deviceMacAddress = BitConverter.ToString(macBytes).Replace("-", ":");
+
+            // 7. If device is known, attempt to connect
+            if (scannerManager.Scanners.TryGetValue(deviceMacAddress, out var scanner))
+            {
+                scannerManager.DisableDetection();
+                scanner.Connect().SafeFireAndForget();
+            }
+        }
     }
 
     private void ScannerPaired(object? sender, IUnitechScanner scanner)
@@ -92,7 +137,12 @@ public partial class ScannerPairingPopupViewModel(IUnitechScannerManager scanner
 
     private void ScannerAppeared(object? sender, IUnitechScanner scanner)
     {
-        if (!scannerManager.IsMacAddressRequired)
+        if (scanner.Id.Equals(deviceMacAddress))
+        {
+            scannerManager.DisableDetection();
+            scanner.Connect().SafeFireAndForget();
+        }
+        else if (!scannerManager.IsMacAddressRequired)
         {
             var identifier = PairingBarcode?.Substring(6) ?? "N/A";
             if (scanner?.Name?.Contains(identifier) ?? false)
@@ -112,7 +162,16 @@ public partial class ScannerPairingPopupViewModel(IUnitechScannerManager scanner
     {
         //Clean up
         scannerManager.Connected -= ScannerConnected;
+        scannerManager.Appeared -= ScannerAppeared;
+        scannerManager.Paired -= ScannerPaired;
         scannerManager.DisableDetection();
+
+        //Stop NFC Listening, if supported
+        if (nfc.IsAvailable && nfc.IsEnabled)
+        {
+            nfc.OnMessageReceived -= Nfc_OnMessageReceived;
+            nfc.StopListening();
+        }
 
         return Task.CompletedTask;
     }

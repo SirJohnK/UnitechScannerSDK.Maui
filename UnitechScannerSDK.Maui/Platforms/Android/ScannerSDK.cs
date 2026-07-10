@@ -73,8 +73,6 @@ public sealed partial class ScannerSDK(UnitechScannerSDKOptions options) : Java.
     /// </param>
     public async Task<bool> ConnectAsync(UnitechDevice device, TimeSpan? timeout = null)
     {
-        await DisconnectAsync(timeout).ConfigureAwait(false);
-
         var reader = new BarcodeReader(device.ToNativeModel());
         reader.AddListener(this);
         _reader = reader;

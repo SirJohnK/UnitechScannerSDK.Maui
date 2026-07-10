@@ -56,9 +56,6 @@ public partial class MainViewModel : ObservableObject
 
         //Enable Scanner Detection
         scannerManager.EnableDetection();
-
-        //Get Connected Scanners
-        Scanners = [];
     }
 
     public Task OnDisappearingAsync()

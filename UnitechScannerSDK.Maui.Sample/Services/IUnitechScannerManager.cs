@@ -48,6 +48,11 @@ public interface IUnitechScannerManager : IDisposable
     event EventHandler<string>? Disconnected;
 
     /// <summary>
+    /// Gets a dictionary of currently detected scanners, keyed by their unique identifier.
+    /// </summary>
+    IDictionary<string, IUnitechScanner> Scanners { get; }
+
+    /// <summary>
     /// Gets a value indicating whether a MAC address is required for generating a pairing barcode.
     /// </summary>
     bool IsMacAddressRequired { get; }

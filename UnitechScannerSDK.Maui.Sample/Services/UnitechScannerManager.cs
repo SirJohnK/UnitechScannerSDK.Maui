@@ -49,7 +49,7 @@ public class UnitechScannerManager : IUnitechScannerManager, IDisposable
         //Setup Event handlers
         scannerSDK.BarcodeScanned += ScannerBarcodeData;
         scannerSDK.DeviceFound += ScannerAppeared;
-        scannerSDK.PairedDeviceFound += ScannerAppeared;
+        scannerSDK.PairedDeviceFound += ScannerPaired;
         scannerSDK.DevicePaired += ScannerPaired;
         scannerSDK.ConnectionChanged += ConnectionChanged;
     }
@@ -97,7 +97,12 @@ public class UnitechScannerManager : IUnitechScannerManager, IDisposable
     }
 
     /// <summary>
-    /// Gets or Sets a value indicating whether a MAC address is required for generating a pairing barcode.
+    /// Gets a dictionary of currently detected scanners, keyed by their unique identifier.
+    /// </summary>
+    public IDictionary<string, IUnitechScanner> Scanners => scanners;
+
+    /// <summary>
+    /// Gets a value indicating whether a MAC address is required for generating a pairing barcode.
     /// </summary>
     public bool IsMacAddressRequired => scannerSDK.Options.IsMacAddressRequired;
 
