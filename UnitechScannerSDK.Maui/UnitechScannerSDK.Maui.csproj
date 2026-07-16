@@ -17,17 +17,11 @@
     <Description>Enhanced .NET MAUI version of the Unitech Scanner SDK.</Description>
     <PackageProjectUrl>https://github.com/SirJohnK/UnitechScannerSDK.Maui</PackageProjectUrl>
     <RepositoryUrl>https://github.com/SirJohnK/UnitechScannerSDK.Maui</RepositoryUrl>
-    <PackageReleaseNotes>- Add UnitechScannerSDKOptions
-- Add DeviceParam handling
-- Rename ScannerService to ScannerSDK
-- Add Package configuration
-- Add PairedDeviceFound and DevicePaired events
-- Add GetPairingBarcode method
-- Remove iOS</PackageReleaseNotes>
+    <PackageReleaseNotes>- Inital release</PackageReleaseNotes>
     <PackageTags>dotnet;dotnetmaui;unitech;scanner;sdk</PackageTags>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-    <Version>1.0.0-prerelease.3</Version>
+    <Version>1.0.0</Version>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
 
